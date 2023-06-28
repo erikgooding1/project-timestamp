@@ -26,19 +26,32 @@ app.get("/api/hello", function(req, res) {
 
 app.get("/api/:date", (req, res) => {
   let dateParam = req.params.date;
-  if(dateParam.match(/^\d{4}-\d{2}-\d{2}/)) {
-    const newDate = new Date(dateParam);
-    let utcString = newDate.toUTCString();
-    let unixNum = newDate.getTime();
-    let retJson = {unix: unixNum, utc: utcString}
+  if(!isNaN(dateParam)) {
+    let parsedDate = Number(dateParam);
+    const dateObj = new Date(parsedDate);
+    let utcString = dateObj.toUTCString();
+    let retJson = { unix: parsedDate, utc: utcString }
     res.json(retJson);
   } else {
-    let unixNum = Number(dateParam);
-    const newDate = new Date(unixNum);
-    let utcString = newDate.toUTCString();
-    let retJson = {unix: unixNum, utc: utcString}
-    res.json(retJson);
+    let parsedDate = Date.parse(dateParam);
+    if(parsedDate) {
+      const dateObj = new Date(parsedDate);
+      let utcString = dateObj.toUTCString();
+      let retJson = { unix: parsedDate, utc: utcString }
+      res.json(retJson);
+    } else {
+      let retJson = { error: "Invalid Date" }
+      res.json(retJson);
+    }
   }
+})
+
+app.get("/api", (req, res) => {
+  let currentDate = new Date();
+  let utcString = currentDate.toUTCString();
+  let unixNum = currentDate.getTime();
+  let retJson = { unix: unixNum, utc: utcString }
+  res.json(retJson);
 })
 
 
